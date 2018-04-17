@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <title>Contador de Sueca</title>
+  </head>
+  <body>
+    <div class="container">
+      <div id="won" class="d-none alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Parabéns! Você venceu!</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="lost" class="d-none alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Você perdeu! :(</strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <h2 class="text-center">Contador de Sueca</h2>
+      <div class="row">
+        <div class="col-sm">
+          <div class="card">
+            <div class="card-header">
+              <h5 class="card-title text-primary">Pontuação do jogo</h5>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col">
+                  <p><strong>Nós: </strong><span id="nos">0 pontos</span></p>
+                </div>
+                <div class="col">
+                  <p><strong>Eles: </strong><span id="eles">0 pontos</span></p>
+                </div>
+              </div>
+              <p id="empate" class="text-danger text-hide"><strong>Empate:</strong> ponto acumulado para próxima rodada</p>
+            </div>
+            <div class="card-footer text-info">
+              <p><strong>Pontos rodada (nós): </strong><span id="rodada">0 pontos</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col">
+          <button type="button" id="q-btn" class="btn btn-primary btn-block">Q - 02 pontos <span id="q-bdg" class="badge badge-pill badge-light">-</button>
+          <button type="button" id="j-btn" class="btn btn-primary btn-block">J - 03 pontos <span id="j-bdg" class="badge badge-pill badge-light">-</button>
+          <button type="button" id="k-btn" class="btn btn-primary btn-block">K - 04 pontos <span id="k-bdg" class="badge badge-pill badge-light">-</button>
+          <button type="button" id="s-btn" class="btn btn-primary btn-block">7 - 10 pontos <span id="s-bdg" class="badge badge-pill badge-light">-</button>
+          <button type="button" id="a-btn" class="btn btn-primary btn-block">A - 11 pontos <span id="a-bdg" class="badge badge-pill badge-light">-</button>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col">
+          <button type="button" id="corrige" class="btn btn-warning btn-block">Corrige</button>
+        </div>
+        <div class="col">
+          <button type="button" id="envia" class="btn btn-success btn-block">Envia</button>
+        </div>
+    </div>
+    <div id="bandeirada" class="d-none">
+      <br>
+      <div class="card border-info">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <p>Bandeirada?</p>
+            </div>
+            <div class="col-3">
+              <button type="button" id="naoBandeirada" class="btn btn-sm btn-outline-danger btn-block">Não</button>
+            </div>
+            <div class="col-3">
+              <button type="button" id="simBandeirada" class="btn btn-sm btn-outline-success btn-block">Sim</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col">
+        <button type="button" id="limpaTudo" class="btn btn-danger btn-block">Limpa Tudo?</button>
+      </div>
+    </div>
+    <div id="reset" class="d-none">
+      <br>
+      <div class="card border-info">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-6">
+              <p>Limpar tudo?</p>
+            </div>
+            <div class="col-3">
+              <button type="button" id="naoReset" class="btn btn-sm btn-outline-danger btn-block">Não</button>
+            </div>
+            <div class="col-3">
+              <button type="button" id="simReset" class="btn btn-sm btn-outline-success btn-block">Sim</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
