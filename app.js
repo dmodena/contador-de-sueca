@@ -1,137 +1,148 @@
-var pontosRodada = { q: 0, j: 0, k: 0, s: 0, a: 0 }
-var pontosJogoNos = 0
-var pontosJogoEles = 0
-var pontosEmpate = 0
+var Pontuacao = function () {
+  this.rodada = { q: 0, j: 0, k: 0, s: 0, a: 0 }
+  this.pontosJogo = { nos: 0, eles: 0 }
+  this.empate = 0
+
+  this.pontosRodada = function () {
+    return this.rodada.q * 2
+      + this.rodada.j * 3
+      + this.rodada.k * 4
+      + this.rodada.s * 10
+      + this.rodada.a * 11
+  }
+
+  this.adicionaCarta = function (carta) {
+    switch (carta) {
+      case 'q':
+        if (this.rodada.q < 4) ++this.rodada.q
+        break;
+      case 'j':
+        if (this.rodada.j < 4) ++this.rodada.j
+        break;
+      case 'k':
+        if (this.rodada.k < 4) ++this.rodada.k
+        break;
+      case 's':
+        if (this.rodada.s < 4) ++this.rodada.s
+        break;
+      case 'a':
+        if (this.rodada.a < 4) ++this.rodada.a
+        break;
+    }
+  }
+
+  this.limpaRodada = function () {
+    this.rodada.q = 0
+    this.rodada.j = 0
+    this.rodada.k = 0
+    this.rodada.s = 0
+    this.rodada.a = 0
+  }
+
+  this.enviaRodada = function (bandeirada) {
+    var soma = this.pontosRodada()
+    if (soma === 0) {
+      this.pontosJogo.eles += this.empate
+      this.empate = 0
+      this.pontosJogo.eles += 2
+      if (bandeirada) this.pontosJogo.eles += 2
+    } else if (soma < 30) {
+      this.pontosJogo.eles += this.empate
+      this.empate = 0
+      this.pontosJogo.eles += 2
+    } else if (soma < 60) {
+      this.pontosJogo.eles += this.empate
+      this.empate = 0
+      this.pontosJogo.eles += 1
+    } else if (soma === 60) {
+      this.empate += 1
+    } else if (soma < 90) {
+      this.pontosJogo.nos += this.empate
+      this.empate = 0
+      this.pontosJogo.nos += 1
+    } else if (soma < 120) {
+      this.pontosJogo.nos += this.empate
+      this.empate = 0
+      this.pontosJogo.nos += 2
+    } else {
+      this.pontosJogo.nos += this.empate
+      this.empate = 0
+      this.pontosJogo.nos += 2
+      if (bandeirada) this.pontosJogo.nos += 2
+    }
+  }
+
+  this.limpaPontuacao = function () {
+    this.limpaRodada()
+    this.pontosJogo.nos = 0
+    this.pontosJogo.eles = 0
+    this.empate = 0
+  }
+}
+
+var pontuacao = new Pontuacao()
 
 var addPts = function (pos) {
-  switch (pos) {
-    case 'q':
-      if (pontosRodada.q < 4) ++pontosRodada.q;
-      break;
-    case 'j':
-      if (pontosRodada.j < 4) ++pontosRodada.j;
-      break;
-    case 'k':
-      if (pontosRodada.k < 4) ++pontosRodada.k;
-      break;
-    case 's':
-      if (pontosRodada.s < 4) ++pontosRodada.s;
-      break;
-    case 'a':
-      if (pontosRodada.a < 4) ++pontosRodada.a;
-      break;
-  }
+  pontuacao.adicionaCarta(pos)
   updatePts()
 }
 
 var updatePts = function () {
-  qBdg.html(pontosRodada.q || '-')
-  jBdg.html(pontosRodada.j || '-')
-  kBdg.html(pontosRodada.k || '-')
-  sBdg.html(pontosRodada.s || '-')
-  aBdg.html(pontosRodada.a || '-')
+  qBdg.html(pontuacao.rodada.q || '-')
+  jBdg.html(pontuacao.rodada.j || '-')
+  kBdg.html(pontuacao.rodada.k || '-')
+  sBdg.html(pontuacao.rodada.s || '-')
+  aBdg.html(pontuacao.rodada.a || '-')
 
-  rodada.html(somaPontosRodada() + ' pontos')
-}
-
-var somaPontosRodada = function () {
-  return (pontosRodada.q * 2)
-    + (pontosRodada.j * 3)
-    + (pontosRodada.k * 4)
-    + (pontosRodada.s * 10)
-    + (pontosRodada.a * 11)
+  rodada.html(pontuacao.pontosRodada() + ' pontos')
 }
 
 var limpaRodada = function () {
-  pontosRodada.q = 0
-  pontosRodada.j = 0
-  pontosRodada.k = 0
-  pontosRodada.s = 0
-  pontosRodada.a = 0
+  pontuacao.limpaRodada()
   $('#bandeirada').addClass('d-none')
   updatePts()
 }
 
 var enviaPontos = function () {
   $('#empate').addClass('text-hide')
-  if (somaPontosRodada() === 0) {
+  if (pontuacao.pontosRodada() === 0 || pontuacao.pontosRodada() === 120) {
     $('#bandeirada').removeClass('d-none')
+  } else if (pontuacao.pontosRodada() === 60 ) {
+    pontuacao.enviaRodada()
+    $('#empate').removeClass('text-hide')
+    limpaRodada()
   } else {
-    if (somaPontosRodada() < 30) {
-      pontosJogoEles += pontosEmpate
-      pontosJogoEles += 2
-      pontosEmpate = 0
-      updatePontosJogos()
-    } else if (somaPontosRodada() < 60) {
-      pontosJogoEles += pontosEmpate
-      pontosJogoEles += 1
-      pontosEmpate = 0
-      updatePontosJogos()
-    } else if (somaPontosRodada() == 60) {
-      pontosEmpate += 1
-      $('#empate').removeClass('text-hide')
-      limpaRodada()
-    } else if (somaPontosRodada() < 90) {
-      pontosJogoNos += pontosEmpate
-      pontosJogoNos += 1
-      pontosEmpate = 0
-      updatePontosJogos()
-    } else if (somaPontosRodada() < 120){
-      pontosJogoNos += pontosEmpate
-      pontosJogoNos += 2
-      pontosEmpate = 0
-      updatePontosJogos()
-    } else {
-      $('#bandeirada').removeClass('d-none')
-    }
+    pontuacao.enviaRodada()
+    updatePontosJogos()
   }
 }
 
+var updatePontosJogos = function () {
+  if (pontuacao.pontosJogo.nos >= 4) {
+    $('#won').removeClass('d-none')
+  }
+  else if (pontuacao.pontosJogo.eles >= 4) {
+    $('#lost').removeClass('d-none')
+  }
+  nos.html(pontuacao.pontosJogo.nos + (pontuacao.pontosJogo.nos == 1 ? ' ponto' : ' pontos'))
+  eles.html(pontuacao.pontosJogo.eles + (pontuacao.pontosJogo.eles == 1 ? ' ponto' : ' pontos'))
+  limpaRodada()
+}
+
 var rejeitaBandeirada = function () {
-  if (somaPontosRodada() === 0) {
-    pontosJogoEles += pontosEmpate
-    pontosJogoEles += 2
-    updatePontosJogos()
-  }
-  else if (somaPontosRodada() === 120) {
-    pontosJogoNos += pontosEmpate
-    pontosJogoNos += 2
-    updatePontosJogos()
-  }
+  pontuacao.enviaRodada(false)
+  updatePontosJogos()
   $('#bandeirada').addClass('d-none')
 }
 
 var confirmaBandeirada = function () {
-  if (somaPontosRodada() === 0) {
-    pontosJogoEles += 4
-    pontosEmpate = 0
-    updatePontosJogos()
-  }
-  else if (somaPontosRodada() === 120) {
-    pontosJogoNos += 4
-    pontosEmpate = 0
-    updatePontosJogos()
-  }
+  pontuacao.enviaRodada(true)
+  updatePontosJogos()
   $('#bandeirada').addClass('d-none')
 }
 
-var updatePontosJogos = function () {
-  if (pontosJogoNos >= 4) {
-    $('#won').removeClass('d-none')
-  }
-  else if (pontosJogoEles >= 4) {
-    $('#lost').removeClass('d-none')
-  }
-  nos.html(pontosJogoNos)
-  eles.html(pontosJogoEles)
-  limpaRodada()
-}
-
 var resetAll = function () {
-  limpaRodada()
-  pontosJogoNos = 0
-  pontosJogoEles = 0
-  pontosEmpate = 0
+  pontuacao.limpaPontuacao()
   updatePontosJogos()
   $('#reset').addClass('d-none')
 }
