@@ -2,11 +2,12 @@ if (window.Worker) {
   var myWorker = new Worker('worker.js')
   myWorker.postMessage({ action: 'init' })
   myWorker.onmessage = function (e) {
+    $('#progress').hide()
     console.log(e.data)
   }
 }
 else {
-  $('#container').html('<div class="card text-white bg-danger"><div class="card-body"><h4 class="card-title text-center">Seu navegador não possui suporte a Web Workers</h4><p class="card-text text-center">Por favor, atualize seu navegador.</p></div></div>')
+  $('#container').html('<div class="card text-white bg-danger mt-3"><div class="card-body"><h4 class="card-title text-center">Seu navegador não possui suporte a Web Workers</h4><p class="card-text text-center">Por favor, atualize seu navegador.</p></div></div>')
 }
 
 var getNos = function () {
