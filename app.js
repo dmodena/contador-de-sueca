@@ -1,150 +1,107 @@
-var Pontuacao = function () {
-  this.rodada = { q: 0, j: 0, k: 0, s: 0, a: 0 }
-  this.pontosJogo = { nos: 0, eles: 0 }
-  this.empate = 0
-
-  this.pontosRodada = function () {
-    return this.rodada.q * 2
-      + this.rodada.j * 3
-      + this.rodada.k * 4
-      + this.rodada.s * 10
-      + this.rodada.a * 11
-  }
-
-  this.adicionaCarta = function (carta) {
-    switch (carta) {
-      case 'q':
-        if (this.rodada.q < 4) ++this.rodada.q
-        break;
-      case 'j':
-        if (this.rodada.j < 4) ++this.rodada.j
-        break;
-      case 'k':
-        if (this.rodada.k < 4) ++this.rodada.k
-        break;
-      case 's':
-        if (this.rodada.s < 4) ++this.rodada.s
-        break;
-      case 'a':
-        if (this.rodada.a < 4) ++this.rodada.a
-        break;
-    }
-  }
-
-  this.limpaRodada = function () {
-    this.rodada.q = 0
-    this.rodada.j = 0
-    this.rodada.k = 0
-    this.rodada.s = 0
-    this.rodada.a = 0
-  }
-
-  this.enviaRodada = function (bandeirada) {
-    var soma = this.pontosRodada()
-    if (soma === 0) {
-      this.pontosJogo.eles += this.empate
-      this.empate = 0
-      this.pontosJogo.eles += 2
-      if (bandeirada) this.pontosJogo.eles += 2
-    } else if (soma < 30) {
-      this.pontosJogo.eles += this.empate
-      this.empate = 0
-      this.pontosJogo.eles += 2
-    } else if (soma < 60) {
-      this.pontosJogo.eles += this.empate
-      this.empate = 0
-      this.pontosJogo.eles += 1
-    } else if (soma === 60) {
-      this.empate += 1
-    } else if (soma < 90) {
-      this.pontosJogo.nos += this.empate
-      this.empate = 0
-      this.pontosJogo.nos += 1
-    } else if (soma < 120) {
-      this.pontosJogo.nos += this.empate
-      this.empate = 0
-      this.pontosJogo.nos += 2
-    } else {
-      this.pontosJogo.nos += this.empate
-      this.empate = 0
-      this.pontosJogo.nos += 2
-      if (bandeirada) this.pontosJogo.nos += 2
-    }
-  }
-
-  this.limpaPontuacao = function () {
-    this.limpaRodada()
-    this.pontosJogo.nos = 0
-    this.pontosJogo.eles = 0
-    this.empate = 0
+if (window.Worker) {
+  var myWorker = new Worker('worker.js')
+  myWorker.postMessage({ action: 'init' })
+  myWorker.onmessage = function (e) {
+    console.log(e.data)
   }
 }
+else {
+  $('#container').html('<div class="card text-white bg-danger"><div class="card-body"><h4 class="card-title text-center">Seu navegador não possui suporte a Web Workers</h4><p class="card-text text-center">Por favor, atualize seu navegador.</p></div></div>')
+}
 
-var pontuacao = new Pontuacao()
+var getNos = function () {
+  return parseInt($('#nos').text().match(/[0-9]+/)[0])
+}
+
+var getEles = function () {
+  return parseInt($('#eles').text().match(/[0-9]+/)[0])
+}
+
+var getRodada = function () {
+  return parseInt($('#rodada').text().match(/[0-9]+/)[0])
+}
 
 var addPts = function (pos) {
-  pontuacao.adicionaCarta(pos)
-  updatePts()
+  myWorker.postMessage({ action: 'adicionaCarta', value: pos })
+  myWorker.onmessage = function (e) {
+    updatePts(pos, e.data)
+  }
 }
 
-var updatePts = function () {
-  qBdg.html(pontuacao.rodada.q || '-')
-  jBdg.html(pontuacao.rodada.j || '-')
-  kBdg.html(pontuacao.rodada.k || '-')
-  sBdg.html(pontuacao.rodada.s || '-')
-  aBdg.html(pontuacao.rodada.a || '-')
+var updatePts = function (pos, val) {
+  if (pos === 'q') qBdg.html(val || '-')
+  else if (pos === 'j') jBdg.html(val || '-')
+  else if (pos === 'k') kBdg.html(val || '-')
+  else if (pos === 's') sBdg.html(val || '-')
+  else if (pos === 'a') aBdg.html(val || '-')
 
-  rodada.html(pontuacao.pontosRodada() + ' pontos')
+  myWorker.postMessage({ action: 'pontosRodada' })
+  myWorker.onmessage = function (e) {
+    rodada.html(e.data + ' pontos')
+  }
 }
 
 var limpaRodada = function () {
-  pontuacao.limpaRodada()
-  $('#bandeirada').addClass('d-none')
-  updatePts()
+  myWorker.postMessage({action: 'limpaRodada' })
+  myWorker.onmessage = function (e) {
+    $('#bandeirada').addClass('d-none')
+    $('.badge').each( function () { $(this).html('-') })
+    updatePts()
+  }
 }
 
 var enviaPontos = function () {
   $('#empate').addClass('text-hide')
-  if (pontuacao.pontosRodada() === 0 || pontuacao.pontosRodada() === 120) {
+  if (getRodada() === 0 || getRodada() === 120) {
     $('#bandeirada').removeClass('d-none')
-  } else if (pontuacao.pontosRodada() === 60 ) {
-    pontuacao.enviaRodada()
-    $('#empate').removeClass('text-hide')
-    limpaRodada()
+  } else if (getRodada() === 60 ) {
+    myWorker.postMessage({ action: 'enviaRodada', value: false })
+    myWorker.onmessage = function (e) {
+      $('#empate').removeClass('text-hide')
+      limpaRodada()
+    }
   } else {
-    pontuacao.enviaRodada()
-    updatePontosJogos()
+    myWorker.postMessage({ action: 'enviaRodada', value: false })
+    myWorker.onmessage = function (e) {
+      updatePontosJogos(e.data)
+    }
   }
 }
 
-var updatePontosJogos = function () {
-  if (pontuacao.pontosJogo.nos >= 4) {
+var updatePontosJogos = function (pontosJogo) {
+  if (pontosJogo.nos >= 4) {
     $('#won').removeClass('d-none')
   }
-  else if (pontuacao.pontosJogo.eles >= 4) {
+  else if (pontosJogo.eles >= 4) {
     $('#lost').removeClass('d-none')
   }
-  nos.html(pontuacao.pontosJogo.nos + (pontuacao.pontosJogo.nos == 1 ? ' ponto' : ' pontos'))
-  eles.html(pontuacao.pontosJogo.eles + (pontuacao.pontosJogo.eles == 1 ? ' ponto' : ' pontos'))
+  nos.html(pontosJogo.nos + (pontosJogo.nos == 1 ? ' ponto' : ' pontos'))
+  eles.html(pontosJogo.eles + (pontosJogo.eles == 1 ? ' ponto' : ' pontos'))
   limpaRodada()
 }
 
 var rejeitaBandeirada = function () {
-  pontuacao.enviaRodada(false)
-  updatePontosJogos()
-  $('#bandeirada').addClass('d-none')
+  myWorker.postMessage({ action: 'enviaRodada', value: false })
+  myWorker.onmessage = function (e) {
+    updatePontosJogos(e.data)
+    $('#bandeirada').addClass('d-none')
+  }
 }
 
 var confirmaBandeirada = function () {
-  pontuacao.enviaRodada(true)
-  updatePontosJogos()
-  $('#bandeirada').addClass('d-none')
+  myWorker.postMessage({ action: 'enviaRodada', value: true })
+  myWorker.onmessage = function (e) {
+    updatePontosJogos(e.data)
+    $('#bandeirada').addClass('d-none')
+  }
 }
 
 var resetAll = function () {
-  pontuacao.limpaPontuacao()
-  updatePontosJogos()
-  $('#reset').addClass('d-none')
+  myWorker.postMessage({ action: 'limpaPontuacao' })
+  myWorker.onmessage = function (e) {
+    updatePontosJogos(e.data)
+    $('#reset').addClass('d-none')
+  }
 }
 
 var qBtn = $('#q-btn')
